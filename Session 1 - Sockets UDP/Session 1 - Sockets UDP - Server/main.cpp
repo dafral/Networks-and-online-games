@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 	//Bind
 	int enable = 1;
 	int res = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char*)&enable, sizeof(int));
+	
 	if (res == SOCKET_ERROR) {
 		// Log and handle error
 	}

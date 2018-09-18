@@ -37,7 +37,6 @@ int main(int argc, char **argv)
 {
 	SOCKET s = socket(AF_INET, SOCK_DGRAM, 0);
 
-
 	struct sockaddr_in bindAddr;
 
 	bindAddr.sin_family = AF_INET;
@@ -50,6 +49,11 @@ int main(int argc, char **argv)
 	const char *remoteAddrStr = "127.0.0.1"; 
 	inet_pton(AF_INET, remoteAddrStr, &remoteAddr.sin_addr);
 
+	const char * clientBuffer = "ping";
+
+	for (int i = 0; i < 5; i++) {
+		sendto(s, clientBuffer, sizeof(clientBuffer), 0, (const struct sockaddr*)&bindAddr, sizeof(bindAddr));
+	}
 
 	closesocket(s);
 }
