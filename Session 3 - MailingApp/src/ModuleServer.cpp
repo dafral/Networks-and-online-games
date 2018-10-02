@@ -61,6 +61,7 @@ void ModuleServer::onPacketReceived(SOCKET socket, const InputMemoryStream & str
 	PacketType packetType;
 
 	// TODO: Deserialize the packet type
+	stream.Read(packetType);
 
 	LOG("onPacketReceived() - packetType: %d", (int)packetType);
 
