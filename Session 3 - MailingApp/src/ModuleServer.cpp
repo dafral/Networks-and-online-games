@@ -61,7 +61,9 @@ void ModuleServer::onPacketReceived(SOCKET socket, const InputMemoryStream & str
 	PacketType packetType;
 
 	// TODO: Deserialize the packet type
-	stream.Read(packetType);
+	int32_t packeti32;
+	stream.Read(packeti32);
+	packetType = (PacketType)packeti32;
 
 	LOG("onPacketReceived() - packetType: %d", (int)packetType);
 
@@ -111,7 +113,12 @@ void ModuleServer::sendPacketQueryAllMessagesResponse(SOCKET socket, const std::
 	// -- serialize the array size
 	// -- serialize the messages in the array
 
+	outStream.Write((int32_t)PacketType::QueryAllMessagesResponse);
+	outStream.Write((int32_t)messages.size);
+	outStream.Write(messages);
+
 	// TODO: Send the packet (pass the outStream to the sendPacket function)
+	sendPacket(socket, outStream);
 }
 
 void ModuleServer::onPacketReceivedSendMessage(SOCKET socket, const InputMemoryStream & stream)

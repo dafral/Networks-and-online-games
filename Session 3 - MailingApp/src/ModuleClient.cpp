@@ -85,8 +85,24 @@ void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStr
 {
 	messages.clear();
 
-	uint32_t messageCount;
+	int32_t messageCount;
+
 	// TODO: Deserialize the number of messages
+	int32_t packeti32;
+
+	stream.Read(packeti32);
+
+	PacketType packetType = (PacketType)packeti32;
+
+	std::vector<Message> messages_tmp;
+	stream.Read(messages_tmp);
+
+	stream.Read(messageCount);
+
+	for (int i = 0; i++; i < messageCount)
+	{
+		this->messages.push_back(messages_tmp[i]);
+	}
 
 	// TODO: Deserialize messages one by one and push_back them into the messages vector
 	// NOTE: The messages vector is an attribute of this class
@@ -101,8 +117,8 @@ void ModuleClient::sendPacketLogin(const char * username)
 	// TODO: Serialize Login (packet type and username)
 	std::string username_string(username);
 
-	stream.Write((int)PacketType::LoginRequest, sizeof(PacketType::LoginRequest));
-	stream.Write(&username_string, sizeof(username_string));
+	stream.Write((int32_t)PacketType::LoginRequest);
+	stream.Write(&username_string);
 
 	// TODO: Use sendPacket() to send the packet
 	sendPacket(stream);
@@ -115,9 +131,10 @@ void ModuleClient::sendPacketQueryMessages()
 	OutputMemoryStream stream;
 
 	// TODO: Serialize message (only the packet type)
+	stream.Write((int32_t)PacketType::QueryAllMessagesRequest);
 
 	// TODO: Use sendPacket() to send the packet
-
+	sendPacket(stream);
 	messengerState = MessengerState::ReceivingMessages;
 }
 
@@ -231,6 +248,10 @@ void ModuleClient::updateGUI()
 				}
 				ImGui::PopID();
 			}
+		}
+		else if (messengerState == MessengerState::ReceivingMessages)
+		{
+			ImGui::Text("Waiting for messages...");
 		}
 	}
 
