@@ -99,8 +99,10 @@ void ModuleClient::sendPacketLogin(const char * username)
 	OutputMemoryStream stream;
 
 	// TODO: Serialize Login (packet type and username)
+	std::string username_string(username);
+
 	stream.Write((int)PacketType::LoginRequest, sizeof(PacketType::LoginRequest));
-	stream.Write(username, sizeof(username));
+	stream.Write(&username_string, sizeof(username_string));
 
 	// TODO: Use sendPacket() to send the packet
 	sendPacket(stream);
