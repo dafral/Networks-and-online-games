@@ -99,8 +99,11 @@ void ModuleClient::sendPacketLogin(const char * username)
 	OutputMemoryStream stream;
 
 	// TODO: Serialize Login (packet type and username)
+	stream.Write((int)PacketType::LoginRequest, sizeof(PacketType::LoginRequest));
+	stream.Write(username, sizeof(username));
 
 	// TODO: Use sendPacket() to send the packet
+	sendPacket(stream);
 
 	messengerState = MessengerState::RequestingMessages;
 }
