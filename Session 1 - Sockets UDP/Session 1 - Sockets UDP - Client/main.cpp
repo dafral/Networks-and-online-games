@@ -35,6 +35,7 @@ bool CleanupLibs()
 
 int main(int argc, char **argv)
 {
+
 	SOCKET s = socket(AF_INET, SOCK_DGRAM, 0);
 
 	struct sockaddr_in bindAddr;
