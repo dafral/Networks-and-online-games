@@ -86,6 +86,12 @@ std::vector<Message> MySqlDatabaseGateway::getAllMessagesReceivedByUser(const st
 	return messages;
 }
 
+std::vector<Message> MySqlDatabaseGateway::getAllMessagesSentByUser(const std::string & username)
+{
+	std::vector<Message> a;
+	return a;
+}
+
 void MySqlDatabaseGateway::updateGUI()
 {
 	ImGui::Separator();

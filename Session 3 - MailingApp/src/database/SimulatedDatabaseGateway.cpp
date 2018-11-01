@@ -28,3 +28,16 @@ std::vector<Message> SimulatedDatabaseGateway::getAllMessagesReceivedByUser(cons
 	}
 	return messages;
 }
+
+std::vector<Message> SimulatedDatabaseGateway::getAllMessagesSentByUser(const std::string & username)
+{
+	std::vector<Message> messages;
+	for (const auto & message : allMessages)
+	{
+		if (message.senderUsername == username)
+		{
+			messages.push_back(message);
+		}
+	}
+	return messages;
+}

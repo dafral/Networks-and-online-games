@@ -103,7 +103,8 @@ void ModuleServer::onPacketReceivedQueryAllMessages(SOCKET socket, const InputMe
 void ModuleServer::sendPacketQueryAllMessagesResponse(SOCKET socket, const std::string &username)
 {
 	// Obtain the list of messages from the DB
-	std::vector<Message> messages = database()->getAllMessagesReceivedByUser(username);
+	std::vector<Message> received_messages = database()->getAllMessagesReceivedByUser(username);
+	std::vector<Message> sent_messages = database()->getAllMessagesSentByUser(username);
 
 	OutputMemoryStream outStream;
 	// TODO: Create QueryAllMessagesResponse and serialize all the messages
@@ -112,13 +113,23 @@ void ModuleServer::sendPacketQueryAllMessagesResponse(SOCKET socket, const std::
 	// -- serialize the messages in the array
 
 	outStream.Write(PacketType::QueryAllMessagesResponse);
-	outStream.Write(messages.size());
-	for (unsigned int i = 0; i < messages.size(); ++i)
+	outStream.Write(received_messages.size() + sent_messages.size());
+	for (unsigned int i = 0; i < received_messages.size(); ++i)
 	{
-		outStream.Write(messages[i].senderUsername);
-		outStream.Write(messages[i].receiverUsername);
-		outStream.Write(messages[i].subject);
-		outStream.Write(messages[i].body);
+		outStream.Write(received_messages[i].senderUsername);
+		outStream.Write(received_messages[i].receiverUsername);
+		outStream.Write(received_messages[i].subject);
+		outStream.Write(received_messages[i].body);
+		outStream.Write(received_messages[i].type = RECEIVED);
+	}
+
+	for (unsigned int i = 0; i < sent_messages.size(); ++i)
+	{
+		outStream.Write(sent_messages[i].senderUsername);
+		outStream.Write(sent_messages[i].receiverUsername);
+		outStream.Write(sent_messages[i].subject);
+		outStream.Write(sent_messages[i].body);
+		outStream.Write(sent_messages[i].type = SENT);
 	}
 	// TODO: Send the packet (pass the outStream to the sendPacket function)
 	sendPacket(socket, outStream);

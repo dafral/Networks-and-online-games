@@ -56,7 +56,7 @@ void ModuleClient::updateMessenger()
 		// Idle, do nothing
 		break;
 	case ModuleClient::MessengerState::SendingMessage:
-		sendPacketSendMessage(receiverBuf, subjectBuf, messageBuf);
+		sendPacketSendMessage(receiverBuf, subjectBuf, messageBuf, typeBuf);
 		break;
 	default:
 		break;
@@ -84,6 +84,7 @@ void ModuleClient::onPacketReceived(const InputMemoryStream & stream)
 void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStream & stream)
 {
 	received_messages.clear();
+	sent_messages.clear();
 
 	size_t messageCount;
 
@@ -101,9 +102,16 @@ void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStr
 		stream.Read(message.senderUsername);
 		stream.Read(message.subject);
 		stream.Read(message.body);
-		received_messages.push_back(message);
+		stream.Read(message.type);
+		if (message.type == RECEIVED)
+		{
+			received_messages.push_back(message);
+		}
+		else if (message.type == SENT)
+		{
+			sent_messages.push_back(message);
+		}
 	}
-
 	messengerState = MessengerState::ShowingMessages;
 }
 
@@ -135,7 +143,7 @@ void ModuleClient::sendPacketQueryMessages()
 	messengerState = MessengerState::ReceivingMessages;
 }
 
-void ModuleClient::sendPacketSendMessage(const char * receiver, const char * subject, const char *message)
+void ModuleClient::sendPacketSendMessage(const char * receiver, const char * subject, const char *message, MessageTYPE type)
 {
 	OutputMemoryStream stream;
 
@@ -147,9 +155,7 @@ void ModuleClient::sendPacketSendMessage(const char * receiver, const char * sub
 	stream.Write(std::string(receiver));
 	stream.Write(std::string(subject));
 	stream.Write(std::string(message));
-
-	Message message_sent(senderBuf, receiver, subject, message);
-	sent_messages.push_back(message_sent);
+	stream.Write(type);
 
 	// TODO: Use sendPacket() to send the packet
 	sendPacket(stream);
@@ -248,7 +254,7 @@ void ModuleClient::updateGUI()
 			for (auto &message : received_messages)
 			{
 				ImGui::PushID(i++);
-				if (ImGui::TreeNode(&message, "%s - %s", message.senderUsername.c_str(), message.subject.c_str()))
+				if (ImGui::TreeNode(&message, "%s - %s", message.receiverUsername.c_str(), message.subject.c_str()))
 				{
 					ImGui::TextWrapped("%s", message.body.c_str());
 					ImGui::TreePop();
@@ -266,7 +272,7 @@ void ModuleClient::updateGUI()
 			for (auto &message : sent_messages)
 			{
 				ImGui::PushID(i++);
-				if (ImGui::TreeNode(&message, "%s - %s", message.receiverUsername.c_str(), message.subject.c_str()))
+				if (ImGui::TreeNode(&message, "%s - %s", message.senderUsername.c_str(), message.subject.c_str()))
 				{
 					ImGui::TextWrapped("%s", message.body.c_str());
 					ImGui::TreePop();
