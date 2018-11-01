@@ -83,7 +83,7 @@ void ModuleClient::onPacketReceived(const InputMemoryStream & stream)
 
 void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStream & stream)
 {
-	messages.clear();
+	received_messages.clear();
 
 	size_t messageCount;
 
@@ -101,7 +101,7 @@ void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStr
 		stream.Read(message.senderUsername);
 		stream.Read(message.subject);
 		stream.Read(message.body);
-		messages.push_back(message);
+		received_messages.push_back(message);
 	}
 
 	messengerState = MessengerState::ShowingMessages;
@@ -147,6 +147,9 @@ void ModuleClient::sendPacketSendMessage(const char * receiver, const char * sub
 	stream.Write(std::string(receiver));
 	stream.Write(std::string(subject));
 	stream.Write(std::string(message));
+
+	Message message_sent(senderBuf, receiver, subject, message);
+	sent_messages.push_back(message_sent);
 
 	// TODO: Use sendPacket() to send the packet
 	sendPacket(stream);
@@ -237,15 +240,33 @@ void ModuleClient::updateGUI()
 
 			ImGui::Text("Inbox:");
 
-			if (messages.empty()) {
+			if (received_messages.empty()) {
 				ImGui::Text(" - Your inbox is empty.");
 			}
 
 			int i = 0;
-			for (auto &message : messages)
+			for (auto &message : received_messages)
 			{
 				ImGui::PushID(i++);
 				if (ImGui::TreeNode(&message, "%s - %s", message.senderUsername.c_str(), message.subject.c_str()))
+				{
+					ImGui::TextWrapped("%s", message.body.c_str());
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+			}
+
+			ImGui::Text("Sent messages:");
+
+			if (sent_messages.empty()) {
+				ImGui::Text(" - You haven't sent any messages.");
+			}
+
+			i = 0;
+			for (auto &message : sent_messages)
+			{
+				ImGui::PushID(i++);
+				if (ImGui::TreeNode(&message, "%s - %s", message.receiverUsername.c_str(), message.subject.c_str()))
 				{
 					ImGui::TextWrapped("%s", message.body.c_str());
 					ImGui::TreePop();

@@ -87,7 +87,8 @@ private:
 	MessengerState messengerState = MessengerState::SendingLogin;
 
 	// All messages in the client inbox
-	std::vector<Message> messages;
+	std::vector<Message> received_messages;
+	std::vector<Message> sent_messages;
 
 	// Composing Message buffers (for IMGUI)
 	char senderBuf[64] = "loginName";   // Buffer for the sender
