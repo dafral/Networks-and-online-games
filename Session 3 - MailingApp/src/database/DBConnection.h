@@ -7,7 +7,7 @@
 #include <vector>
 
 #define DB_SERVER   "localhost"
-#define DB_PORT     "3306"
+#define DB_PORT     "8000"
 #define DB_NAME     "dbname"
 #define DB_USERNAME "username"
 #define DB_USERPASS "password"

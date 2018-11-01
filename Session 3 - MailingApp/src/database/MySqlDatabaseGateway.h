@@ -26,7 +26,7 @@ private:
 
 	// Text buffers for ImGUI
 	char bufMySqlHost[64] = "citmalumnes.upc.es";
-	char bufMySqlPort[64] = "3306";
+	char bufMySqlPort[64] = "8000";
 	char bufMySqlDatabase[64] = "database";
 	char bufMySqlTable[64] = "messages";
 	char bufMySqlUsername[64] = "username";

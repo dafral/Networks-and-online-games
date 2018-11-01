@@ -85,7 +85,7 @@ void ModuleClient::onPacketReceivedQueryAllMessagesResponse(const InputMemoryStr
 {
 	messages.clear();
 
-	int32_t messageCount;
+	size_t messageCount;
 
 	// TODO: Deserialize the number of message
 
