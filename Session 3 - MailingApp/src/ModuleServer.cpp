@@ -61,9 +61,7 @@ void ModuleServer::onPacketReceived(SOCKET socket, const InputMemoryStream & str
 	PacketType packetType;
 
 	// TODO: Deserialize the packet type
-	int32_t packeti32;
-	stream.Read(packeti32);
-	packetType = (PacketType)packeti32;
+	stream.Read(packetType);
 
 	LOG("onPacketReceived() - packetType: %d", (int)packetType);
 
@@ -113,10 +111,15 @@ void ModuleServer::sendPacketQueryAllMessagesResponse(SOCKET socket, const std::
 	// -- serialize the array size
 	// -- serialize the messages in the array
 
-	outStream.Write((int32_t)PacketType::QueryAllMessagesResponse);
-	outStream.Write((int32_t)messages.size);
-	outStream.Write(messages);
-
+	outStream.Write(PacketType::QueryAllMessagesResponse);
+	outStream.Write(messages.size());
+	for (unsigned int i = 0; i < messages.size(); ++i)
+	{
+		outStream.Write(messages[i].senderUsername);
+		outStream.Write(messages[i].receiverUsername);
+		outStream.Write(messages[i].subject);
+		outStream.Write(messages[i].body);
+	}
 	// TODO: Send the packet (pass the outStream to the sendPacket function)
 	sendPacket(socket, outStream);
 }
@@ -125,6 +128,11 @@ void ModuleServer::onPacketReceivedSendMessage(SOCKET socket, const InputMemoryS
 {
 	Message message;
 	// TODO: Deserialize the packet (all fields in Message)
+
+	stream.Read(message.senderUsername);
+	stream.Read(message.receiverUsername);
+	stream.Read(message.subject);
+	stream.Read(message.body);
 
 	// Insert the message in the database
 	database()->insertMessage(message);
@@ -399,8 +407,8 @@ ModuleServer::ClientStateInfo & ModuleServer::getClientStateInfoForSocket(SOCKET
 			return clientStateInfo;
 		}
 	}
-
-	assert(nullptr && "The client for this socket does not exist.");
+	// Won't compile otherwise:
+	//assert(nullptr && "The client for this socket does not exist.");
 }
 
 bool ModuleServer::existsClientStateInfoForSocket(SOCKET s)

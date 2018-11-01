@@ -47,9 +47,9 @@ public:
 	void Write( T inData )
 	{
 		static_assert(
-				std::is_arithmetic< T >::value ||
-				std::is_enum< T >::value,
-				"Generic Write only supports primitive data types" );
+			std::is_arithmetic< T >::value ||
+			std::is_enum< T >::value,
+			"Generic Write only supports primitive data types");
 
 		if( STREAM_ENDIANNESS == PLATFORM_ENDIANNESS )
 		{
