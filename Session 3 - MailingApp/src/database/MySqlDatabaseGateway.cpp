@@ -88,8 +88,31 @@ std::vector<Message> MySqlDatabaseGateway::getAllMessagesReceivedByUser(const st
 
 std::vector<Message> MySqlDatabaseGateway::getAllMessagesSentByUser(const std::string & username)
 {
-	std::vector<Message> a;
-	return a;
+	std::vector<Message> messages;
+
+	DBConnection db(bufMySqlHost, bufMySqlPort, bufMySqlDatabase, bufMySqlUsername, bufMySqlPassword);
+
+	if (db.isConnected())
+	{
+		std::string sqlStatement;
+		// TODO: Create the SQL statement to query all messages from the given user (SELECT)
+
+		sqlStatement = "SELECT * FROM messages WHERE sender = '" + username + "';";
+
+		// consult all messages
+		DBResultSet res = db.sql(sqlStatement.c_str());
+
+		// fill the array of messages
+		for (auto & messageRow : res.rows)
+		{
+			Message message;
+			message.senderUsername = messageRow.columns[0];
+			message.receiverUsername = messageRow.columns[1];
+			message.subject = messageRow.columns[2];
+			message.body = messageRow.columns[3];
+			messages.push_back(message);
+		}
+	}
 }
 
 void MySqlDatabaseGateway::updateGUI()
