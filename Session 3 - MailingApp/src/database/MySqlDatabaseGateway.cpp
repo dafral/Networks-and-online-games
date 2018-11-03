@@ -113,6 +113,7 @@ std::vector<Message> MySqlDatabaseGateway::getAllMessagesSentByUser(const std::s
 			messages.push_back(message);
 		}
 	}
+	return messages;
 }
 
 void MySqlDatabaseGateway::updateGUI()
